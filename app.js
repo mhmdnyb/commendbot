@@ -3,6 +3,21 @@ const { Bot, Keyboard } = require("grammy");
 const database = require("./database");
 const userModel = require("./models/users");
 const bot = new Bot(process.env.TOKEN);
+//menu keyboard
+const Menukeyboard = new Keyboard()
+  .text("خرید کامند CS2")
+  .icon("5985373149900839207")
+  .success()
+  .row()
+  .text("سوالات متداول")
+  .icon("5339301912716007099")
+  .primary()
+  .row()
+  .text("ارتباط با پشتیبانی")
+  .icon("5240464278464515740")
+  .danger()
+  .row()
+  .resized();
 async function getServer() {
   try {
     const response = await fetch(
@@ -29,37 +44,37 @@ async function getServer() {
     console.log(error);
   }
 }
+//on start command
 bot.command("start", async (ctx) => {
-  await userModel.create({
-    userId: ctx.from.id,
-    username: ctx.from.username,
-    first_name: ctx.from.first_name,
-    balance: 0,
-    amount: 0,
-  });
-  const keyboard = new Keyboard()
-    .text("خرید کامند CS2")
-    .icon("5985373149900839207")
-    .success()
-    .row()
-    .text("سوالات متداول")
-    .icon("5339301912716007099")
-    .primary()
-    .row()
-    .text("ارتباط با پشتیبانی")
-    .icon("5240464278464515740")
-    .danger()
-    .row()
-    .resized();
+  try {
+    await userModel.create({
+      userId: ctx.from.id,
+      username: ctx.from.username,
+      first_name: ctx.from.first_name,
+      balance: 0,
+      amount: 0,
+    });
+  } catch (error) {}
+
   await ctx.reply(
     `سلام <tg-emoji emoji-id=${"5393527657239451953"}>👋</tg-emoji>\nممنون از اینکه ما رو انتخاب کردین!\n\nاز منو زیر یک گزینه رو انتخاب کنید<tg-emoji emoji-id=${"5197474438970363734"}>⤵️</tg-emoji>`,
-    { parse_mode: "HTML", reply_markup: keyboard },
+    { parse_mode: "HTML", reply_markup: Menukeyboard },
   );
 });
 bot.hears("خرید کامند CS2", async (ctx) => {
-  await ctx.reply("buy");
+  const keyboard = new Keyboard()
+    .text("بازگشت")
+    .icon("5352759161945867747")
+    .row()
+    .resized();
+  await ctx.reply(
+    "تعرفه فعلی کامند بات به شرح زیر میباشد <tg-emoji emoji-id=5470177992950946662>👇</tg-emoji>\nFriendly<tg-emoji emoji-id=5451709985765468632>😀</tg-emoji>-Teacher<tg-emoji emoji-id=5983188862678079056>🇷🇺</tg-emoji>-Leader<tg-emoji emoji-id=5219827798125846744>👑</tg-emoji>:2000T\n\nبه این معنا که برای هر 3 کامند شما مبلغ 2000 تک تومن رو پرداخت میکنید!\n\nبرای مثال:\n<tg-emoji emoji-id=6026040876671700880>🗣</tg-emoji>100 - 100 - 100 کامند : 200 هزار تومان<tg-emoji emoji-id=5224257782013769471>💰</tg-emoji>\n<tg-emoji emoji-id=6026040876671700880>🗣</tg-emoji>200 - 200 - 200 کامند : 400 هزار تومان<tg-emoji emoji-id=5224257782013769471>💰</tg-emoji>\n\nتعداد دلخواه خودتون رو ارسال کنید:",
+    { parse_mode: "HTML", reply_markup: keyboard },
+  );
 });
-
+bot.hears("بازگشت", async (ctx) => {
+  await ctx.reply("به منو اصلی برگشتید", { reply_markup: Menukeyboard });
+});
 const startServer = async () => {
   try {
     await database.sync({ force: true });
