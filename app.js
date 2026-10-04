@@ -10,7 +10,12 @@ function initial() {
 }
 bot.use(session({ initial }));
 //menu keyboard
-const Menukeyboard = new Keyboard()
+const backKeyboard = new Keyboard()
+  .text("بازگشت")
+  .icon("5352759161945867747")
+  .row()
+  .resized();
+const menuKeyboard = new Keyboard()
   .text("خرید کامند CS2")
   .icon("5985373149900839207")
   .success()
@@ -65,28 +70,23 @@ bot.command("start", async (ctx) => {
 
   await ctx.reply(
     `سلام <tg-emoji emoji-id=${"5393527657239451953"}>👋</tg-emoji>\nممنون از اینکه ما رو انتخاب کردین!\n\nاز منو زیر یک گزینه رو انتخاب کنید<tg-emoji emoji-id=${"5197474438970363734"}>⤵️</tg-emoji>`,
-    { parse_mode: "HTML", reply_markup: Menukeyboard },
+    { parse_mode: "HTML", reply_markup: menuKeyboard },
   );
 });
 bot.hears("خرید کامند CS2", async (ctx) => {
   //state change so we can track where the user is at
   ctx.session.state = "buying";
 
-  const keyboard = new Keyboard()
-    .text("بازگشت")
-    .icon("5352759161945867747")
-    .row()
-    .resized();
   await ctx.reply(
     "تعرفه فعلی کامند بات به شرح زیر میباشد <tg-emoji emoji-id=5470177992950946662>👇</tg-emoji>\nFriendly<tg-emoji emoji-id=5451709985765468632>😀</tg-emoji>-Teacher<tg-emoji emoji-id=5983188862678079056>🇷🇺</tg-emoji>-Leader<tg-emoji emoji-id=5219827798125846744>👑</tg-emoji>:2000T\n\nبه این معنا که برای هر 3 کامند شما مبلغ 2000 تک تومن رو پرداخت میکنید!\n\nبرای مثال:\n<tg-emoji emoji-id=6026040876671700880>🗣</tg-emoji>100 - 100 - 100 کامند : 200 هزار تومان<tg-emoji emoji-id=5224257782013769471>💰</tg-emoji>\n<tg-emoji emoji-id=6026040876671700880>🗣</tg-emoji>200 - 200 - 200 کامند : 400 هزار تومان<tg-emoji emoji-id=5224257782013769471>💰</tg-emoji>\n\nتعداد دلخواه خودتون رو ارسال کنید:",
-    { parse_mode: "HTML", reply_markup: keyboard },
+    { parse_mode: "HTML", reply_markup: backKeyboard },
   );
 });
 bot.hears("بازگشت", async (ctx) => {
   ctx.session.state = "idle";
-  await ctx.reply("به منو اصلی برگشتید", { reply_markup: Menukeyboard });
+  await ctx.reply("به منو اصلی برگشتید", { reply_markup: menuKeyboard });
 });
-bot.on("message:text", async (ctx) => {
+bot.on(["message:text", "message:photo"], async (ctx) => {
   const numberRegEx = /^[1-9]\d*$/;
   const userProfileRegEx = /(profiles|id)\/([\w-]*)/gm;
   console.log("switch");
@@ -99,7 +99,10 @@ bot.on("message:text", async (ctx) => {
         await ctx.replyWithAnimation(
           "CgACAgQAAxkBAAIBgmrCuYVwIgzLoudTP8OMSjHecppxAALhIwAC84EZUjzlxD2vXH7vPQQ",
           {
-            caption: "حالا لینک پروفایل استیمت رو بفرست:",
+            caption:
+              "حالا لینک پروفایل استیمت رو بفرست <tg-emoji emoji-id=5453902695419104908>🎮</tg-emoji>:",
+            reply_markup: backKeyboard,
+            parse_mode: "HTML",
           },
         );
       }
@@ -107,8 +110,12 @@ bot.on("message:text", async (ctx) => {
     case "link":
       if (userProfileRegEx.test(ctx.message.text)) {
         ctx.session.steamProfile = ctx.message.text;
+        ctx.session.state = "pending";
       }
       break;
+    case "pending":
+      const file = await ctx.getFile();
+      console.log(file.file_id);
   }
 });
 // bot.hears(/^[1-9]\d*$/, async (ctx) => {
