@@ -1,8 +1,14 @@
 require("dotenv").config();
-const { Bot, Keyboard } = require("grammy");
+const { Bot, Keyboard, session } = require("grammy");
 const database = require("./database");
 const userModel = require("./models/users");
 const bot = new Bot(process.env.TOKEN);
+
+//session implementation so we can store data
+function initial() {
+  return { amount: null, steamProfile: null, state: "idle" };
+}
+bot.use(session({ initial }));
 //menu keyboard
 const Menukeyboard = new Keyboard()
   .text("خرید کامند CS2")
@@ -44,6 +50,7 @@ async function getServer() {
     console.log(error);
   }
 }
+
 //on start command
 bot.command("start", async (ctx) => {
   try {
@@ -62,6 +69,9 @@ bot.command("start", async (ctx) => {
   );
 });
 bot.hears("خرید کامند CS2", async (ctx) => {
+  //state change so we can track where the user is at
+  ctx.session.state = "buying";
+
   const keyboard = new Keyboard()
     .text("بازگشت")
     .icon("5352759161945867747")
@@ -73,8 +83,46 @@ bot.hears("خرید کامند CS2", async (ctx) => {
   );
 });
 bot.hears("بازگشت", async (ctx) => {
+  ctx.session.state = "idle";
   await ctx.reply("به منو اصلی برگشتید", { reply_markup: Menukeyboard });
 });
+bot.on("message:text", async (ctx) => {
+  const numberRegEx = /^[1-9]\d*$/;
+  const userProfileRegEx = /(profiles|id)\/([\w-]*)/gm;
+  console.log("switch");
+
+  switch (ctx.session.state) {
+    case "buying":
+      if (numberRegEx.test(ctx.message.text)) {
+        ctx.session.amount = ctx.message.text;
+        ctx.session.state = "link";
+        await ctx.replyWithAnimation(
+          "CgACAgQAAxkBAAIBgmrCuYVwIgzLoudTP8OMSjHecppxAALhIwAC84EZUjzlxD2vXH7vPQQ",
+          {
+            caption: "حالا لینک پروفایل استیمت رو بفرست:",
+          },
+        );
+      }
+      break;
+    case "link":
+      if (userProfileRegEx.test(ctx.message.text)) {
+        ctx.session.steamProfile = ctx.message.text;
+      }
+      break;
+  }
+});
+// bot.hears(/^[1-9]\d*$/, async (ctx) => {
+//   if (ctx.session.state == "buying") {
+//     ctx.session.amount = ctx.message.text;
+//     ctx.session.state = "link";
+//   }
+// });
+// bot.hears(/(profiles|id)\/([\w-]*)/gm, async (ctx) => {
+//   if (ctx.session.state == "link") {
+//     ctx.session.steamProfile = ctx.message.text;
+//     console.log(ctx.session);
+//   }
+// });
 const startServer = async () => {
   try {
     await database.sync({ force: true });
@@ -83,4 +131,5 @@ const startServer = async () => {
     console.log(error);
   }
 };
+
 startServer();
