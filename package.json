@@ -1,0 +1,20 @@
+{
+  "name": "commendbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dew": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "grammy": "^1.46.0",
+    "mysql2": "^3.24.5",
+    "nodemon": "^1.14.10",
+    "sequelize": "^6.37.8"
+  }
+}
