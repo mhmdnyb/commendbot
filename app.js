@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Bot, Keyboard } = require("grammy");
 const database = require("./database");
+const userModel = require("./models/users");
 const bot = new Bot(process.env.TOKEN);
 async function getServer() {
   try {
@@ -29,6 +30,13 @@ async function getServer() {
   }
 }
 bot.command("start", async (ctx) => {
+  await userModel.create({
+    userId: ctx.from.id,
+    username: ctx.from.username,
+    first_name: ctx.from.first_name,
+    balance: 0,
+    amount: 0,
+  });
   const keyboard = new Keyboard()
     .text("خرید کامند CS2")
     .icon("5985373149900839207")
