@@ -1,10 +1,12 @@
 require("dotenv").config();
 const { Bot, Keyboard, session } = require("grammy");
 const database = require("./database");
-const auth = require("./auth");
+
 const userModel = require("./models/users");
 const productModel = require("./models/products");
 const startRoute = require("./command/start");
+const panelRoute = require("./command/panel");
+const buyRoute = require("./routes/buy");
 const bot = new Bot(process.env.TOKEN);
 
 //session implementation so we can store data
@@ -64,18 +66,8 @@ async function getServer() {
   }
 }
 bot.use(startRoute);
-bot.command("panel", auth, async (ctx) => {
-  await ctx.reply("you're an admin");
-});
-bot.hears("خرید کامند CS2", async (ctx) => {
-  //state change so we can track where the user is at
-  ctx.session.state = "buying";
-
-  await ctx.reply(
-    "تعرفه فعلی کامند بات به شرح زیر میباشد <tg-emoji emoji-id=5470177992950946662>👇</tg-emoji>\nFriendly<tg-emoji emoji-id=5451709985765468632>😀</tg-emoji>-Teacher<tg-emoji emoji-id=5983188862678079056>🇷🇺</tg-emoji>-Leader<tg-emoji emoji-id=5219827798125846744>👑</tg-emoji>:2000T\n\nبه این معنا که برای هر 3 کامند شما مبلغ 2000 تک تومن رو پرداخت میکنید!\n\nبرای مثال:\n<tg-emoji emoji-id=6026040876671700880>🗣</tg-emoji>100 - 100 - 100 کامند : 200 هزار تومان<tg-emoji emoji-id=5224257782013769471>💰</tg-emoji>\n<tg-emoji emoji-id=6026040876671700880>🗣</tg-emoji>200 - 200 - 200 کامند : 400 هزار تومان<tg-emoji emoji-id=5224257782013769471>💰</tg-emoji>\n\nتعداد دلخواه خودتون رو ارسال کنید:",
-    { parse_mode: "HTML", reply_markup: backKeyboard },
-  );
-});
+bot.use(panelRoute);
+bot.use(buyRoute);
 bot.hears("بازگشت", async (ctx) => {
   ctx.session.state = "idle";
   await ctx.reply("به منو اصلی برگشتید", { reply_markup: menuKeyboard });
@@ -140,4 +132,4 @@ const startServer = async () => {
 };
 
 startServer();
-module.exports = { menuKeyboard, backKeyboard };
+module.exports = { menuKeyboard, backKeyboard, initial };
