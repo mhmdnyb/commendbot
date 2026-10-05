@@ -2,6 +2,7 @@ require("dotenv").config();
 const { Bot, Keyboard, session } = require("grammy");
 const database = require("./database");
 const userModel = require("./models/users");
+const productModel = require("./models/products");
 const bot = new Bot(process.env.TOKEN);
 
 //session implementation so we can store data
@@ -16,10 +17,15 @@ const backKeyboard = new Keyboard()
   .row()
   .resized();
 const menuKeyboard = new Keyboard()
+
+  .text("شارژ کیف پول", { icon_custom_emoji_id: "5224257782013769471" })
+  .success()
+
   .text("خرید کامند CS2")
   .icon("5985373149900839207")
   .success()
   .row()
+
   .text("سوالات متداول")
   .icon("5339301912716007099")
   .primary()
@@ -86,7 +92,7 @@ bot.hears("بازگشت", async (ctx) => {
   ctx.session.state = "idle";
   await ctx.reply("به منو اصلی برگشتید", { reply_markup: menuKeyboard });
 });
-bot.on(["message:text", "message:photo"], async (ctx) => {
+bot.on(["message:text"], async (ctx) => {
   const numberRegEx = /^[1-9]\d*$/;
   const userProfileRegEx = /(profiles|id)\/([\w-]*)/gm;
   console.log("switch");
@@ -116,6 +122,11 @@ bot.on(["message:text", "message:photo"], async (ctx) => {
     case "pending":
       const file = await ctx.getFile();
       console.log(file.file_id);
+  }
+});
+//hanel payment
+bot.on("message:photo", async (ctx) => {
+  if (ctx.session.state == "topup") {
   }
 });
 // bot.hears(/^[1-9]\d*$/, async (ctx) => {
