@@ -4,6 +4,7 @@ const database = require("./database");
 const auth = require("./auth");
 const userModel = require("./models/users");
 const productModel = require("./models/products");
+const startRoute = require("./command/start");
 const bot = new Bot(process.env.TOKEN);
 
 //session implementation so we can store data
@@ -62,24 +63,7 @@ async function getServer() {
     console.log(error);
   }
 }
-
-//on start command
-bot.command("start", async (ctx) => {
-  try {
-    await userModel.create({
-      userId: ctx.from.id,
-      username: ctx.from.username,
-      first_name: ctx.from.first_name,
-      balance: 0,
-      amount: 0,
-    });
-  } catch (error) {}
-
-  await ctx.reply(
-    `سلام <tg-emoji emoji-id=${"5393527657239451953"}>👋</tg-emoji>\nممنون از اینکه ما رو انتخاب کردین!\n\nاز منو زیر یک گزینه رو انتخاب کنید<tg-emoji emoji-id=${"5197474438970363734"}>⤵️</tg-emoji>`,
-    { parse_mode: "HTML", reply_markup: menuKeyboard },
-  );
-});
+bot.use(startRoute);
 bot.command("panel", auth, async (ctx) => {
   await ctx.reply("you're an admin");
 });
@@ -156,3 +140,4 @@ const startServer = async () => {
 };
 
 startServer();
+module.exports = { menuKeyboard, backKeyboard };
