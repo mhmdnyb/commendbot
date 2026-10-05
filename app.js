@@ -7,6 +7,7 @@ const productModel = require("./models/products");
 const startRoute = require("./command/start");
 const panelRoute = require("./command/panel");
 const buyRoute = require("./routes/buy");
+const buyHandlerRoute = require("./routes/buyHandler");
 const bot = new Bot(process.env.TOKEN);
 
 //session implementation so we can store data
@@ -48,38 +49,8 @@ bot.hears("بازگشت", async (ctx) => {
   ctx.session.state = "idle";
   await ctx.reply("به منو اصلی برگشتید", { reply_markup: menuKeyboard });
 });
-bot.on(["message:text"], async (ctx) => {
-  const numberRegEx = /^[1-9]\d*$/;
-  const userProfileRegEx = /(profiles|id)\/([\w-]*)/gm;
-  console.log("switch");
 
-  switch (ctx.session.state) {
-    case "buying":
-      if (numberRegEx.test(ctx.message.text)) {
-        ctx.session.amount = ctx.message.text;
-        ctx.session.state = "link";
-        await ctx.replyWithAnimation(
-          "CgACAgQAAxkBAAIBgmrCuYVwIgzLoudTP8OMSjHecppxAALhIwAC84EZUjzlxD2vXH7vPQQ",
-          {
-            caption:
-              "حالا لینک پروفایل استیمت رو بفرست <tg-emoji emoji-id=5453902695419104908>🎮</tg-emoji>:",
-            reply_markup: backKeyboard,
-            parse_mode: "HTML",
-          },
-        );
-      }
-      break;
-    case "link":
-      if (userProfileRegEx.test(ctx.message.text)) {
-        ctx.session.steamProfile = ctx.message.text;
-        ctx.session.state = "pending";
-      }
-      break;
-    case "pending":
-      const file = await ctx.getFile();
-      console.log(file.file_id);
-  }
-});
+bot.use(buyHandlerRoute);
 //hanel payment
 bot.on("message:photo", async (ctx) => {
   if (ctx.session.state == "topup") {
