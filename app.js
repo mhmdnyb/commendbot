@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Bot, Keyboard, session } = require("grammy");
 const database = require("./database");
+const auth = require("./auth");
 const userModel = require("./models/users");
 const productModel = require("./models/products");
 const bot = new Bot(process.env.TOKEN);
@@ -79,6 +80,9 @@ bot.command("start", async (ctx) => {
     { parse_mode: "HTML", reply_markup: menuKeyboard },
   );
 });
+bot.command("panel", auth, async (ctx) => {
+  await ctx.reply("you're an admin");
+});
 bot.hears("خرید کامند CS2", async (ctx) => {
   //state change so we can track where the user is at
   ctx.session.state = "buying";
@@ -141,6 +145,7 @@ bot.on("message:photo", async (ctx) => {
 //     console.log(ctx.session);
 //   }
 // });
+
 const startServer = async () => {
   try {
     await database.sync({ force: true });
