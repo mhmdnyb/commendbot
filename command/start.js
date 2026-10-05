@@ -1,5 +1,6 @@
 const { Composer } = require("grammy");
-const { menuKeyboard } = require("../app");
+const userModel = require("../models/users");
+const { menuKeyboard } = require("../keyboards");
 const startRoute = new Composer();
 //on start command
 startRoute.command("start", async (ctx) => {
@@ -12,6 +13,7 @@ startRoute.command("start", async (ctx) => {
       amount: 0,
     });
   } catch (error) {}
+  ctx.session.state = "idle";
 
   await ctx.reply(
     `سلام <tg-emoji emoji-id=${"5393527657239451953"}>👋</tg-emoji>\nممنون از اینکه ما رو انتخاب کردین!\n\nاز منو زیر یک گزینه رو انتخاب کنید<tg-emoji emoji-id=${"5197474438970363734"}>⤵️</tg-emoji>`,

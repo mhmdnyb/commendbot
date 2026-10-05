@@ -1,6 +1,6 @@
-const adminList = [1875341048];
+const adminList = ["1875341048"];
 async function auth(ctx, next) {
-  if (!adminList.includes(ctx.from.id)) {
+  if (!adminList.includes(`${ctx.from.id}`)) {
     return;
   }
   await next();
