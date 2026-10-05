@@ -19,3 +19,4 @@ const Products = database.define("products", {
     allowNull: false,
   },
 });
+module.exports = Products;
