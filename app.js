@@ -87,24 +87,25 @@ bot.on("message:photo", async (ctx) => {
 //   }
 // });
 
+const http = require("http");
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Bot is running!");
+}).listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
 const startServer = async () => {
   try {
     productModel.belongsTo(userModel);
     userModel.hasMany(productModel);
     await database.sync({ force: false });
-
-    const http = require("http");
-    const PORT = process.env.PORT || 3000;
-    http.createServer((req, res) => {
-      res.writeHead(200, { "Content-Type": "text/plain" });
-      res.end("Bot is running!");
-    }).listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
-    });
+    console.log("Database connected and synced successfully.");
 
     bot.start();
   } catch (error) {
-    console.log(error);
+    console.error("Database or bot startup error:", error);
   }
 };
 
