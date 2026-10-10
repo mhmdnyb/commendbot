@@ -16,6 +16,8 @@ const menuKeyboard = new Keyboard()
   .text("سوالات متداول")
   .icon("5339301912716007099")
   .primary()
+  .text("حساب کاربری", { icon_custom_emoji_id: "5258011929993026890" })
+  .primary()
   .row()
   .text("ارتباط با پشتیبانی")
   .icon("5240464278464515740")
@@ -23,4 +25,24 @@ const menuKeyboard = new Keyboard()
   .row()
   .resized();
 
-module.exports = { backKeyboard, menuKeyboard };
+const adminKeyboard = new Keyboard()
+  .text("اضافه کردن موجودی", { icon_custom_emoji_id: "5224257782013769471" })
+  .success()
+  .resized()
+  .text("لیست کاربران", { icon_custom_emoji_id: "5258011929993026890" })
+
+  .primary()
+  .row()
+  .text("همگانی به همه کاربران", {
+    icon_custom_emoji_id: "5452002597592382164",
+  })
+  .danger()
+  .row()
+  .text("سفارشات", { icon_custom_emoji_id: "5192844064793327232" })
+  .success();
+const commendKeyboard = new Keyboard()
+  .text("وصل شدم")
+  .success()
+  .resized()
+  .oneTime();
+module.exports = { backKeyboard, menuKeyboard, adminKeyboard, commendKeyboard };
