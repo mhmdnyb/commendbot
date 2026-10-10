@@ -13,10 +13,5 @@ const Products = database.define("products", {
     unique: true,
     allowNull: false,
   },
-  customer: {
-    type: DataTypes.INTEGER,
-    unique: false,
-    allowNull: false,
-  },
 });
 module.exports = Products;
